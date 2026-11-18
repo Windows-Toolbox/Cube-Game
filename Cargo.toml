@@ -1,0 +1,52 @@
+[package]
+name = "cube-game"
+version = "2.0.0"
+edition = "2024"
+publish = false
+description = "The game window itself is the arena – and it keeps shrinking. Shoot its edges to push them back out."
+repository = "https://github.com/Windows-Toolbox/Cube-Game"
+
+# What the Toolbox needs to know; program.json is generated from this by build.rs (Toolbox\DESIGN.md 15.4).
+# No background role: the program runs while the game is open (Toolbox\DESIGN.md 5).
+[package.metadata.toolbox]
+id = "cube_game"
+exe = "CubeGame.exe"
+category = { de = "Spiele", en = "Games" }
+background = false
+name = "Cube Game"
+description = { de = "Das Spielfenster selbst ist die Arena – und es schrumpft ständig. Schieß gegen die Ränder, um es wieder aufzudrücken.", en = "The game window itself is the arena – and it keeps shrinking. Shoot its edges to push them back out." }
+button = { de = "Spielen", en = "Play" }
+
+[dependencies]
+# The shared library of the Windows Toolbox, compiled in (from its main branch).
+kit = { package = "toolbox-kit", git = "https://github.com/Windows-Toolbox/Toolbox" }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = { version = "1.0.154", features = ["preserve_order"] }
+# Drawing into the window's memory (shapes, pictures) – the part pygame did; text with fontdue.
+tiny-skia = { version = "0.11.4", default-features = false, features = ["std", "simd", "png-format"] }
+fontdue = "0.9.3"
+windows-sys = { version = "0.61.2", features = [
+    "Win32_Foundation",
+    "Win32_Graphics_Dwm",
+    "Win32_Graphics_Gdi",
+    "Win32_System_LibraryLoader",
+    "Win32_System_Performance",
+    "Win32_System_Threading",
+    "Win32_UI_HiDpi",
+    "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_UI_WindowsAndMessaging",
+] }
+
+[build-dependencies]
+kit = { package = "toolbox-kit", git = "https://github.com/Windows-Toolbox/Toolbox", default-features = false, features = ["build"] }
+
+[profile.release]
+lto = true
+strip = true
+codegen-units = 1
+
+# The game is unplayable without optimisation; debug builds optimise this crate a little and the others fully.
+[profile.dev]
+opt-level = 1
+[profile.dev.package."*"]
+opt-level = 3

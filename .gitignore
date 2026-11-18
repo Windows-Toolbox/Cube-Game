@@ -1,0 +1,4 @@
+# The build folder and the installed program (created by cargo and build.ps1); dist\data\ holds your
+# settings, your progress and your own enemy pictures.
+target/
+dist/
