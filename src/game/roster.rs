@@ -175,9 +175,6 @@ impl Roster {
         }
         Roster { stats, buffs: vec![] }
     }
-    pub fn shared(difficulty: Option<&Difficulty>) -> RosterRef {
-        Rc::new(RefCell::new(Roster::new(difficulty, None)))
-    }
     /// The roster's buffs that apply to type `key`.
     pub fn buffs_for(&self, key: &str) -> impl Iterator<Item = &Buff> {
         self.buffs.iter().filter(move |b| b.target.as_deref().is_none_or(|t| t == key))

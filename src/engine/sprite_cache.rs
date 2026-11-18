@@ -51,10 +51,6 @@ pub fn get(key: &str, make: impl FnOnce() -> Option<Surface>) -> Option<Rc<Surfa
     picture
 }
 
-pub fn clear() {
-    PICTURES.with(|c| c.borrow_mut().pictures.clear());
-}
-
 thread_local! {
     static SCRATCH: RefCell<HashMap<(i32, i32), Surface>> = RefCell::new(HashMap::new());
 }

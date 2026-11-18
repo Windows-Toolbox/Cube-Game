@@ -19,7 +19,6 @@ const REACH: i32 = 2;
 
 pub struct Field {
     pub arena_rect: FRect,
-    pub main: Rect,
     /// The arena, every extra window, the lookouts last.
     pub sight: Vec<Rect>,
     /// Windows that are only for seeing (a Pusher's).
@@ -58,7 +57,7 @@ impl Field {
         let mut rects = vec![main];
         rects.extend(connected.iter().copied());
         let windows = connected.iter().map(|w| w.inflate(REACH, REACH)).collect();
-        Field { arena_rect: arena.rect, main, sight, lookouts: lookouts.to_vec(), rects, windows }
+        Field { arena_rect: arena.rect, sight, lookouts: lookouts.to_vec(), rects, windows }
     }
 
     fn side_hit(&self, p: Vec2) -> Option<&'static str> {

@@ -1,6 +1,5 @@
 //! The small scenes and menus: the main menu (`main_menu_scene.py`) and the pause menu (`pause_menu.py`).
 
-use std::any::Any;
 
 use super::settings::{self, HINT_ALPHA, TEXT, TEXT_MUTED};
 use super::shapes::draw_ship;
@@ -63,7 +62,8 @@ impl Scene for MainMenuScene {
         let controls = draw_text_a(surface, "SHIFT dash  ·  SPACE rocket  ·  TAB inventory  ·  T shop  ·  ESC menu", 20, TEXT, HINT_ALPHA * 2.0, Anchor::MidBottom, area.centerx(), area.bottom() - 16);
         draw_text_a(surface, "W A S D move  ·  mouse aim  ·  left click shoot", 20, TEXT, HINT_ALPHA * 2.0, Anchor::MidBottom, area.centerx(), controls.top() - 4);
     }
-    fn as_any(&mut self) -> &mut dyn Any {
+    #[cfg(test)]
+    fn as_any(&mut self) -> &mut dyn std::any::Any {
         self
     }
 }

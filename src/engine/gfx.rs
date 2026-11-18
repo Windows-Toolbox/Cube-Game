@@ -60,15 +60,6 @@ impl Color {
         }
         Some(Color::fa(n[0], n[1], n[2], *n.get(3).unwrap_or(&255.0)))
     }
-    pub fn tuple(self) -> (u8, u8, u8) {
-        (self.r, self.g, self.b)
-    }
-    /// Mixed with `other`: 0 = this colour, 1 = the other one.
-    pub fn lerp(self, other: Color, t: f64) -> Color {
-        let t = t.clamp(0.0, 1.0);
-        let m = |a: u8, b: u8| a as f64 + (b as f64 - a as f64) * t;
-        Color::fa(m(self.r, other.r), m(self.g, other.g), m(self.b, other.b), m(self.a, other.a))
-    }
     fn sk(self, opaque: bool) -> SkColor {
         // Swapped on purpose: the pictures hold blue, green, red (see the top of this file).
         SkColor::from_rgba8(self.b, self.g, self.r, if opaque { 255 } else { self.a })
@@ -85,8 +76,6 @@ pub enum Blend {
     Normal,
     /// `BLEND_RGB_ADD`: the colours are added up.
     Add,
-    /// `BLEND_RGBA_MAX`: the brighter one of each channel wins.
-    Max,
 }
 
 enum Store {
@@ -145,20 +134,12 @@ impl Surface {
         }
         s
     }
-    pub fn from_pixmap_rgba(mut p: Pixmap) -> Surface {
-        swap_red_blue(p.data_mut());
-        let (w, h) = (p.width(), p.height());
-        Surface { store: Store::Owned(p), w, h, srcalpha: true, alpha: 255 }
-    }
 
     pub fn width(&self) -> i32 {
         self.w as i32
     }
     pub fn height(&self) -> i32 {
         self.h as i32
-    }
-    pub fn size(&self) -> (i32, i32) {
-        (self.w as i32, self.h as i32)
     }
     /// `get_rect()`: at 0, 0 with the picture's size.
     pub fn get_rect(&self) -> Rect {
@@ -236,6 +217,7 @@ impl Surface {
             }
         }
     }
+    #[cfg(test)]
     pub fn get_at(&self, x: i32, y: i32) -> Color {
         if x < 0 || y < 0 || x >= self.w as i32 || y >= self.h as i32 {
             return Color::default();
@@ -445,7 +427,6 @@ impl Surface {
             Blend::Normal if !src.srcalpha && src.alpha == 255 => BlendMode::Source,
             Blend::Normal => BlendMode::SourceOver,
             Blend::Add => BlendMode::Plus,
-            Blend::Max => BlendMode::Lighten,
         };
         let paint = PixmapPaint { opacity: if mode == Blend::Normal { opacity } else { 1.0 }, blend_mode: blend, quality: FilterQuality::Nearest };
         let src_ref = src.as_ref_pixmap();
@@ -485,6 +466,7 @@ impl Surface {
             }
         }
     }
+    #[cfg(test)]
     /// Saves the picture as a PNG file (tests: to look at what was drawn).
     pub fn save_png(&self, path: &std::path::Path) -> bool {
         let Some(mut p) = Pixmap::new(self.w.max(1), self.h.max(1)) else { return false };
@@ -546,17 +528,6 @@ impl Surface {
             px[2] = (color.r as u32 * a / 255) as u8;
         }
         out
-    }
-    /// The alpha of every pixel (0 = see-through) – what `pygame.mask.from_surface` reads.
-    pub fn alpha_at(&self, x: i32, y: i32) -> u8 {
-        if x < 0 || y < 0 || x >= self.w as i32 || y >= self.h as i32 {
-            return 0;
-        }
-        if !self.srcalpha {
-            return 255;
-        }
-        let (data, stride) = self.pixels();
-        data[((y as u32 * stride + x as u32) * 4 + 3) as usize]
     }
 }
 

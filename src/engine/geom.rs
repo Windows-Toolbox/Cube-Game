@@ -186,6 +186,7 @@ pub fn py_mod(a: f64, b: f64) -> f64 {
     if r != 0.0 && (r < 0.0) != (b < 0.0) { r + b } else { r }
 }
 
+#[cfg(test)]
 /// Python's `//` for whole numbers: rounds down, not towards zero.
 pub fn py_div(a: i32, b: i32) -> i32 {
     let q = a / b;
@@ -204,13 +205,12 @@ macro_rules! rect_type {
             pub h: $t,
         }
 
+        // One API for Rect and FRect, as in pygame; each of the two uses only part of it.
+        #[allow(dead_code)]
         impl $name {
             pub fn new(x: impl Into<f64>, y: impl Into<f64>, w: impl Into<f64>, h: impl Into<f64>) -> Self {
                 let f = $from;
                 Self { x: f(x.into()), y: f(y.into()), w: f(w.into()), h: f(h.into()) }
-            }
-            pub fn from_size(w: impl Into<f64>, h: impl Into<f64>) -> Self {
-                Self::new(0.0, 0.0, w, h)
             }
             fn half(v: $t) -> $t {
                 $half(v)
@@ -237,12 +237,6 @@ macro_rules! rect_type {
             pub fn centery(&self) -> $t {
                 self.y + Self::half(self.h)
             }
-            pub fn width(&self) -> $t {
-                self.w
-            }
-            pub fn height(&self) -> $t {
-                self.h
-            }
             pub fn size(&self) -> ($t, $t) {
                 (self.w, self.h)
             }
@@ -252,26 +246,8 @@ macro_rules! rect_type {
             pub fn topleft(&self) -> ($t, $t) {
                 (self.x, self.y)
             }
-            pub fn topright(&self) -> ($t, $t) {
-                (self.right(), self.y)
-            }
-            pub fn bottomleft(&self) -> ($t, $t) {
-                (self.x, self.bottom())
-            }
             pub fn bottomright(&self) -> ($t, $t) {
                 (self.right(), self.bottom())
-            }
-            pub fn midtop(&self) -> ($t, $t) {
-                (self.centerx(), self.y)
-            }
-            pub fn midbottom(&self) -> ($t, $t) {
-                (self.centerx(), self.bottom())
-            }
-            pub fn midleft(&self) -> ($t, $t) {
-                (self.x, self.centery())
-            }
-            pub fn midright(&self) -> ($t, $t) {
-                (self.right(), self.centery())
             }
             pub fn centerv(&self) -> Vec2 {
                 Vec2::new(self.centerx() as f64, self.centery() as f64)
@@ -297,12 +273,6 @@ macro_rules! rect_type {
             }
             pub fn set_centery(&mut self, v: impl Into<f64>) {
                 self.y = Self::conv(v.into()) - Self::half(self.h);
-            }
-            pub fn set_width(&mut self, v: impl Into<f64>) {
-                self.w = Self::conv(v.into());
-            }
-            pub fn set_height(&mut self, v: impl Into<f64>) {
-                self.h = Self::conv(v.into());
             }
             pub fn set_size(&mut self, w: impl Into<f64>, h: impl Into<f64>) {
                 self.w = Self::conv(w.into());
@@ -377,12 +347,6 @@ macro_rules! rect_type {
             }
             pub fn inflate_ip(&mut self, dx: impl Into<f64>, dy: impl Into<f64>) {
                 *self = self.inflate(dx, dy);
-            }
-            pub fn scale_by(&self, factor: f64) -> Self {
-                let (w, h) = (self.w as f64 * factor, self.h as f64 * factor);
-                let mut r = Self::new(0.0, 0.0, w, h);
-                r.set_center(self.centerx() as f64, self.centery() as f64);
-                r
             }
 
             /// Moved inside `other` (pygame's `clamp`); bigger than it: centred on it.
@@ -479,10 +443,6 @@ macro_rules! rect_type {
                     && self.x + self.w > o.x
                     && self.y + self.h > o.y
             }
-            /// The first of `others` this one overlaps (its index).
-            pub fn collidelist(&self, others: &[Self]) -> Option<usize> {
-                others.iter().position(|o| self.colliderect(o))
-            }
             /// Does the line from `a` to `b` touch the rectangle (pygame's `clipline`, as a yes/no)?
             pub fn clipline(&self, a: Vec2, b: Vec2) -> bool {
                 if self.w as f64 <= 0.0 || self.h as f64 <= 0.0 {
@@ -513,10 +473,6 @@ macro_rules! rect_type {
                     }
                 }
                 t0 <= t1
-            }
-            pub fn is_empty(&self) -> bool {
-                let zero = Self::conv(0.0);
-                self.w <= zero || self.h <= zero
             }
         }
     };

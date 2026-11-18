@@ -32,7 +32,6 @@ pub struct Ship {
     pub rect: FRect,
     pub color: Color,
     pub size: f64,
-    pub name: String,
     /// Direction the nose points in (length 1).
     pub aim: Vec2,
     pub speed: f64,
@@ -72,7 +71,6 @@ impl Ship {
             rect,
             color: stats.color,
             size: stats.size,
-            name: stats.name.clone(),
             aim: vec2(0.0, -1.0),
             speed: stats.speed,
             weapons: [Some(Weapon::new("gun")), None],

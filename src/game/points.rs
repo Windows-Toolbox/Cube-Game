@@ -27,7 +27,6 @@ use crate::engine::{Anchor, Color, Rect, Surface, Vec2, rgb, rgba, vec2};
 use crate::pyfmt::g;
 use crate::rng;
 
-pub const FINDS: [&str; 3] = ["chest", "magnet", "repair"];
 pub const THREATS: [&str; 3] = ["totem", "nest", "storm"];
 pub const KINDS: [&str; 6] = ["chest", "magnet", "repair", "totem", "nest", "storm"];
 

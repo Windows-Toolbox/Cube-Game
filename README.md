@@ -28,8 +28,7 @@ Controls: W A S D move · mouse aim · left click shoot · right click or mouse 
 Space rocket · B watchtower · Tab inventory · T shop · Esc menu · F3 key display.
 
 What you keep between runs is in `dist\data\profile.json` (cores, skill tree, cards, loadout, best times); the page's
-settings in `dist\data\settings.json`; your enemy pictures in `dist\data\images\`. The Python version's progress
-(`Toolbox\data\cube_game.json`) is carried over at the first start.
+settings in `dist\data\settings.json`; your enemy pictures in `dist\data\images\`.
 
 ## Building
 
@@ -48,7 +47,7 @@ its own license (GPL with font exception: it may be embedded in any program).
 
 | Path | What |
 |---|---|
-| `src/main.rs` | the connection to the Toolbox: settings, page, Play / Stop, carrying over the old progress |
+| `src/main.rs` | the connection to the Toolbox: settings, page, Play / Stop |
 | `src/engine/` | everything not specific to this game: `window.rs` (layered windows, extra windows, mouse lock, input), `gfx.rs` (drawing on tiny-skia, with pygame's rules), `font.rs`, `geom.rs` (pygame's Rect/FRect/Vector2), `mod.rs` (the game loop, scenes), `menu.rs`, `ui.rs`, `key_overlay.rs`, `collision.rs`, `desktop.rs`, `sprite_cache.rs` |
 | `src/game/` | the game: scenes (`scenes.rs`, `game_menu.rs`, `play_scene.rs`, `game_over.rs`), `panels.rs` (the game menu's tabs), `ship.rs`, `weapons.rs`, `abilities.rs`, `enemies.rs` (all types and their looks), `spawner.rs`, `roster.rs`, `arena.rs`, `field.rs`, `points.rs`, `radar.rs`, `buildings.rs`, `effects.rs`, `projectile.rs`, `pickups.rs`, `hud.rs`, `shop.rs`, `cards.rs`, `skill_tree.rs`, `profile.rs`, `difficulty.rs`, `tables.rs` (ships, abilities, weapons, radar, points, buildings), `shop_data.rs`, `settings.rs`, `shapes.rs` |
 | `content/` | the data files (ships, weapons, enemies, levels, …) – changed without compiling |
@@ -98,11 +97,10 @@ Game
 Toolbox
 - ✓ Kit program without background role: page with the two settings and the pictures button, Play / Stop, a
   second start brings the window to the front, `bye` after the game closes (kit: `Runtime::stop`)
-- ✓ The Python version's progress carried over once (test)
 - ◐ Hand test: Play, Stop and the page in the real Toolbox
 
 Changed on purpose
-- The progress file is `data\profile.json` next to the exe (was `Toolbox\data\cube_game.json`), the pictures folder
+- The progress file is `data\profile.json` next to the exe, the pictures folder
   `data\images\` (was `assets\images\` in the program folder) – both are yours, never touched by a build or update.
 - Random numbers come from an own generator (not Python's) – a run never played the same twice anyway.
 - If Windows refuses the layered window, the Python version fell back to SDL's flickering way; this one runs without a

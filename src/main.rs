@@ -12,10 +12,9 @@
 //! page the program ends. "Stop" in the Toolbox closes the game. The page's two settings are read when the game
 //! starts (as in the Python version: they apply from the next start or run).
 //!
-//! The progress (cores, skill tree, cards, best times) is in `data\profile.json`; the Python version kept it in the
-//! classic Toolbox's `data\cube_game.json` – it is carried over once.
+//! The progress (cores, skill tree, cards, best times) is in `data\profile.json`.
 #![windows_subsystem = "windows"]
-#![allow(dead_code)] // the engine offers more than this game uses yet
+
 
 mod content;
 mod engine;
@@ -23,7 +22,6 @@ mod game;
 mod pyfmt;
 mod rng;
 
-use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
@@ -139,35 +137,9 @@ fn play(settings: &Settings, stop: Arc<AtomicBool>, show: Arc<AtomicBool>) {
     engine.run(Box::new(scene));
 }
 
-/// On the first start (no `data\profile.json` yet): the progress of the Python version is carried over once, if a
-/// classic Toolbox lies in one of the folders above (its `data\cube_game.json` – without the page's settings, which
-/// go to the kit's `data\settings.json`).
-fn carry_over(program_dir: &Path, data: &Path) {
-    let target = data.join("profile.json");
-    if target.exists() {
-        return;
-    }
-    for above in program_dir.ancestors().skip(1).take(4) {
-        for old_data in [above.join("data"), above.join("Toolbox").join("data")] {
-            let file: PathBuf = old_data.join("cube_game.json");
-            let Some(mut old) = std::fs::read_to_string(&file).ok().and_then(|t| serde_json::from_str::<serde_json::Value>(t.trim_start_matches('\u{feff}')).ok()) else { continue };
-            let settings = old.as_object_mut().and_then(|o| o.remove("settings"));
-            let _ = std::fs::create_dir_all(data);
-            let _ = std::fs::write(&target, serde_json::to_string_pretty(&old).unwrap_or_default());
-            // the page's two settings, if the kit has none yet
-            if let Some(s) = settings.filter(|_| !data.join("settings.json").exists()) {
-                let _ = std::fs::write(data.join("settings.json"), serde_json::to_string_pretty(&s).unwrap_or_default());
-            }
-            app::log(&format!("progress carried over from {}", file.display()));
-            return;
-        }
-    }
-}
-
 fn main() {
     kit::texts!();
     app::init(&CubeGame::META);
-    carry_over(&app::program_dir(), &app::data_dir());
     let game = CubeGame { settings: Settings::default(), stop: Arc::new(AtomicBool::new(false)), show: Arc::new(AtomicBool::new(false)) };
     app::run(game, work);
 }
@@ -188,31 +160,5 @@ mod tests {
     #[test]
     fn texts_are_complete() {
         kit::i18n::check_ids(env!("CARGO_MANIFEST_DIR")).unwrap();
-    }
-
-    /// The progress of the Python version is carried over once – without the page's settings, which go to the kit's
-    /// file.
-    #[test]
-    fn progress_is_carried_over() {
-        let root = std::env::temp_dir().join(format!("cube-game-carry-{}", std::process::id()));
-        let _ = std::fs::remove_dir_all(&root);
-        let program = root.join("Cube Game").join("dist");
-        let old = root.join("Toolbox").join("data");
-        std::fs::create_dir_all(&old).unwrap();
-        std::fs::create_dir_all(&program).unwrap();
-        std::fs::write(old.join("cube_game.json"), r#"{"cores": 42, "settings": {"key_display": false, "all_monitors": true}}"#).unwrap();
-        let data = program.join("data");
-        carry_over(&program, &data);
-        let p: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(data.join("profile.json")).unwrap()).unwrap();
-        assert_eq!(p["cores"], 42);
-        assert!(p.get("settings").is_none());
-        let s: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(data.join("settings.json")).unwrap()).unwrap();
-        assert_eq!(s["all_monitors"], true);
-        // only once
-        std::fs::write(old.join("cube_game.json"), r#"{"cores": 1}"#).unwrap();
-        carry_over(&program, &data);
-        let p: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(data.join("profile.json")).unwrap()).unwrap();
-        assert_eq!(p["cores"], 42);
-        let _ = std::fs::remove_dir_all(&root);
     }
 }

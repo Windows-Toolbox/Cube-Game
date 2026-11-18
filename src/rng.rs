@@ -90,12 +90,6 @@ impl Rng {
         all.truncate(k);
         all
     }
-    /// `random.gauss(mu, sigma)`.
-    pub fn gauss(&mut self, mu: f64, sigma: f64) -> f64 {
-        let u1 = self.random().max(1e-300);
-        let u2 = self.random();
-        mu + sigma * (-2.0 * u1.ln()).sqrt() * (std::f64::consts::TAU * u2).cos()
-    }
 }
 
 thread_local! {
@@ -107,6 +101,7 @@ pub fn with<R>(f: impl FnOnce(&mut Rng) -> R) -> R {
     RNG.with(|r| f(&mut r.borrow_mut()))
 }
 
+#[cfg(test)]
 /// For tests and the bot: the same numbers every time.
 pub fn seed(seed: u64) {
     RNG.with(|r| *r.borrow_mut() = Rng::seeded(seed));
@@ -118,9 +113,6 @@ pub fn random() -> f64 {
 pub fn uniform(a: f64, b: f64) -> f64 {
     with(|r| r.uniform(a, b))
 }
-pub fn randint(a: i64, b: i64) -> i64 {
-    with(|r| r.randint(a, b))
-}
 pub fn chance(p: f64) -> bool {
     with(|r| r.chance(p))
 }
@@ -130,12 +122,6 @@ pub fn weighted(weights: &[f64]) -> Option<usize> {
 pub fn index(len: usize) -> Option<usize> {
     with(|r| r.index(len))
 }
-pub fn shuffle<T>(items: &mut [T]) {
-    with(|r| r.shuffle(items))
-}
 pub fn sample(n: usize, k: usize) -> Vec<usize> {
     with(|r| r.sample(n, k))
-}
-pub fn gauss(mu: f64, sigma: f64) -> f64 {
-    with(|r| r.gauss(mu, sigma))
 }

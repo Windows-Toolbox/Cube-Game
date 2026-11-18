@@ -29,7 +29,6 @@ pub struct WatchtowerKit {
 }
 
 impl WatchtowerKit {
-    pub const NAME: &'static str = "Watchtower";
     pub fn new(max_count: i64) -> WatchtowerKit {
         WatchtowerKit { max_count, vision: buildings::get(KEY, "vision"), bought: 0 }
     }

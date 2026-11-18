@@ -53,6 +53,7 @@ thread_local! {
     static TEST_AREAS: std::cell::RefCell<Option<Vec<Rect>>> = const { std::cell::RefCell::new(None) };
 }
 
+#[cfg(test)]
 /// For tests: these areas instead of the real monitors (first = main monitor).
 pub fn set_test_areas(areas: Vec<Rect>) {
     TEST_AREAS.with(|t| *t.borrow_mut() = Some(areas));

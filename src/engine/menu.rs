@@ -55,9 +55,6 @@ impl<A: Clone> Menu<A> {
     pub fn new(buttons: Vec<Button<A>>) -> Self {
         Menu { buttons, selected: 0, width: 260, height: 46, spacing: 12, font_size: 30 }
     }
-    pub fn total_height(&self) -> i32 {
-        self.buttons.len() as i32 * self.height + (self.buttons.len() as i32 - 1) * self.spacing
-    }
     /// Places the buttons below each other, the first one's top centre at `(x, y)`.
     pub fn layout(&mut self, x: i32, mut y: i32) {
         for b in &mut self.buttons {

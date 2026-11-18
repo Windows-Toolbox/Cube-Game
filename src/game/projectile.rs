@@ -123,24 +123,12 @@ impl Projectile {
         Projectile::with(position, vec2(1.0, 0.0), stats, None, Look::Mine { age: 0.0 })
     }
 
-    pub fn is_mine(&self) -> bool {
-        matches!(self.look, Look::Mine { .. })
-    }
     pub fn center(&self) -> Vec2 {
         self.rect.centerv()
     }
     /// Current speed in pixels per second (base speed × effects this tick).
     pub fn speed(&self) -> f64 {
         self.base_speed * self.speed_factor
-    }
-    /// Changes the flight path for good (a shot with a target forgets it).
-    pub fn redirect(&mut self, direction: Vec2) {
-        self.direction = direction.normalize();
-        self.target = None;
-    }
-    /// Slows the shot for this tick, e.g. 0.5 = half speed.
-    pub fn slow(&mut self, factor: f64) {
-        self.speed_factor *= factor;
     }
     pub fn can_pierce(&self) -> bool {
         (self.pierced.len() as i64) < self.stats.pierce

@@ -84,11 +84,6 @@ pub fn text_size(text: &str, size: i32) -> (i32, i32) {
     })
 }
 
-/// The height of a line – pygame's `font.get_height()`.
-pub fn line_height(size: i32) -> i32 {
-    text_size("", size).1
-}
-
 /// `font.render(text, True, color)`: the text on a see-through picture just big enough for it.
 pub fn render(text: &str, size: i32, color: Color) -> Surface {
     let px = px(size);

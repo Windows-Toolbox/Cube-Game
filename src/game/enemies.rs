@@ -321,10 +321,6 @@ impl Enemy {
         Rc::new(RefCell::new(Enemy::new(key, position, roster)))
     }
 
-    pub fn key(&self) -> &'static str {
-        self.info.key
-    }
-
     /// The value for this run with every active buff: (value + adds) × factors.
     pub fn stat(&self, name: &str) -> f64 {
         let (mut add, mut factor) = (0.0, 1.0);

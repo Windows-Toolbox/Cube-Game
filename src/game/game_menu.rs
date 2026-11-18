@@ -2,7 +2,6 @@
 //! tabs Levels, Loadout, Skill tree and Cards (the cards only once the card shop is bought). Every data file is read
 //! again when it opens; problems in them are shown in red.
 
-use std::any::Any;
 
 use super::difficulty;
 use super::hud::clock as format_time;
@@ -470,7 +469,8 @@ impl Scene for GameMenuScene {
         }
     }
 
-    fn as_any(&mut self) -> &mut dyn Any {
+    #[cfg(test)]
+    fn as_any(&mut self) -> &mut dyn std::any::Any {
         self
     }
 }

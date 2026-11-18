@@ -102,13 +102,6 @@ impl Arena {
         }
         if self.fixed_speed { speed } else { self.changed("shrink_speed", speed).max(0.0) }
     }
-    /// A fixed speed from now on (e.g. 0 to stop the walls) – phases do not change it any more either.
-    pub fn set_shrink_speed(&mut self, speed: f64) {
-        self.start_shrink_speed = speed;
-        self.shrink_growth = 0.0;
-        self.max_shrink_speed = None;
-        self.fixed_speed = true;
-    }
     /// Pixels every push of an edge is shorter right now.
     pub fn armor(&self) -> f64 {
         self.changed("armor", self.base_armor).max(0.0)

@@ -3,7 +3,6 @@
 //!
 //! Input is ignored for a moment at the start: the player may still be clicking or holding a key from the run.
 
-use std::any::Any;
 
 use super::difficulty;
 use super::hud::clock;
@@ -123,7 +122,8 @@ impl Scene for GameOverScene {
         }
         self.menu.draw(surface, panel.centerx(), 310);
     }
-    fn as_any(&mut self) -> &mut dyn Any {
+    #[cfg(test)]
+    fn as_any(&mut self) -> &mut dyn std::any::Any {
         self
     }
 }

@@ -75,6 +75,7 @@ pub trait Scene {
     fn draw(&mut self, e: &mut Engine, surface: &mut Surface);
     /// Draw an extra window's content onto `surface` – the part of the world at the view's rect.
     fn draw_view(&mut self, _e: &mut Engine, _surface: &mut Surface, _view: ViewId, _rect: Rect) {}
+    #[cfg(test)]
     /// For tests and the bot: the scene as what it is.
     fn as_any(&mut self) -> &mut dyn std::any::Any;
 }
@@ -113,6 +114,7 @@ impl Engine {
         let headless = window.is_none();
         Engine::make(rect, window, headless)
     }
+    #[cfg(test)]
     /// Without any window (tests, the bot).
     pub fn headless(rect: Rect) -> Engine {
         Engine::make(rect, None, true)
@@ -133,9 +135,6 @@ impl Engine {
             fake_buttons: [false; 3],
             fake_keys: Default::default(),
         }
-    }
-    pub fn is_headless(&self) -> bool {
-        self.headless
     }
 
     /// Where the window is on the screen – or will be after this frame, if the scene has moved it.
@@ -179,9 +178,6 @@ impl Engine {
     }
     pub fn key_held(&self, key: window::Key) -> bool {
         if self.headless { self.fake_keys.contains(&key) } else { window::key_held(key) }
-    }
-    pub fn any_key_held(&self, keys: &[window::Key]) -> bool {
-        keys.iter().any(|k| self.key_held(*k))
     }
 
     // ---------- extra windows ----------
@@ -233,9 +229,6 @@ impl Engine {
     }
     pub fn stop(&mut self) {
         self.running = false;
-    }
-    pub fn running(&self) -> bool {
-        self.running
     }
 
     fn switch(&mut self, current: &mut Box<dyn Scene>) -> bool {
@@ -356,6 +349,7 @@ impl Engine {
         self.switch(scene);
         self.running = true;
     }
+    #[cfg(test)]
     /// For tests and the bot: one tick of `scene` without windows, after `events`, with the scene switches it asks
     /// for.
     pub fn step(&mut self, scene: &mut Box<dyn Scene>, events: &[Event]) {
@@ -367,6 +361,7 @@ impl Engine {
         self.switch(scene);
         self.shown_topleft = self.target_rect.topleft();
     }
+    #[cfg(test)]
     /// For tests: draws `scene` into a picture of the window's size, as the window would show it.
     pub fn snapshot(&mut self, scene: &mut Box<dyn Scene>) -> Surface {
         let r = self.target_rect;

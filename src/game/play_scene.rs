@@ -14,7 +14,6 @@
 //! States: playing, paused (Esc), inventory (Tab) and shop (T). Outside playing nothing moves, the mouse is free and
 //! the window shows only the panel, centred on the arena. Leaving the window pauses the game, too.
 
-use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
@@ -1137,7 +1136,8 @@ impl Scene for PlayScene {
         }
     }
 
-    fn as_any(&mut self) -> &mut dyn Any {
+    #[cfg(test)]
+    fn as_any(&mut self) -> &mut dyn std::any::Any {
         self
     }
 }

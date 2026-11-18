@@ -90,15 +90,12 @@ fn read_sections(file: &str, defaults: &Value, positive: &[&str], unknown_sectio
 
 macro_rules! table_access {
     ($cell:ident) => {
-        /// The whole table.
-        pub fn all() -> Table {
-            $cell.with(|t| t.borrow().clone())
-        }
         /// `STATS[section][name]` as a number.
         pub fn get(section: &str, name: &str) -> f64 {
             $cell.with(|t| t.borrow().get(section).and_then(|s| s.get(name)).map(super::f).unwrap_or(0.0))
         }
-        /// One section (`STATS[section]`).
+        /// One section (`STATS[section]`) – not every table needs it.
+        #[allow(dead_code)]
         pub fn section(section: &str) -> super::Table {
             $cell.with(|t| t.borrow().get(section).and_then(|s| s.as_object()).cloned().unwrap_or_default())
         }
