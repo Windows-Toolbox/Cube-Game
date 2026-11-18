@@ -2,6 +2,7 @@
 name = "cube-game"
 version = "2.0.0"
 edition = "2024"
+license = "MIT"
 publish = false
 description = "The game window itself is the arena – and it keeps shrinking. Shoot its edges to push them back out."
 repository = "https://github.com/Windows-Toolbox/Cube-Game"

@@ -39,6 +39,11 @@ every value); a release has them compiled in. `cargo test` runs the tests, all w
 that plays every level for 2½ minutes with the whole skill tree and draws every frame into memory.
 `cargo test pictures -- --ignored` saves pictures of the menus and a run to the temp folder.
 
+## License
+
+MIT (see [LICENSE](LICENSE)) – except `assets/freesansbold.ttf`, pygame's built-in font from GNU FreeFont, which keeps
+its own license (GPL with font exception: it may be embedded in any program).
+
 ## The files
 
 | Path | What |
