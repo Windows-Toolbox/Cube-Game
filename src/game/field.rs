@@ -12,6 +12,7 @@
 
 use super::arena::{Arena, SIDES};
 use super::projectile::Projectile;
+use crate::engine::geom::fit;
 use crate::engine::{FRect, Rect, Vec2, vec2};
 
 /// Windows this close count as touching (rounded window positions leave no gap).
@@ -92,7 +93,7 @@ impl Field {
         }
         self.rects
             .iter()
-            .map(|r| vec2(p.x.clamp(r.left() as f64, (r.right() - 1) as f64), p.y.clamp(r.top() as f64, (r.bottom() - 1) as f64)))
+            .map(|r| vec2(fit(p.x, r.left() as f64, (r.right() - 1) as f64), fit(p.y, r.top() as f64, (r.bottom() - 1) as f64)))
             .min_by(|a, b| a.distance_squared_to(p).total_cmp(&b.distance_squared_to(p)))
             .unwrap_or(p)
     }

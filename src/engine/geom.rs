@@ -9,6 +9,14 @@
 
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
+/// `v` kept between `lo` and `hi` the way Python's `max(lo, min(v, hi))` does it: when the range is empty
+/// (`lo > hi`, e.g. a window shrunk smaller than its margins) the result is `lo`. Rust's own `clamp` panics then –
+/// that crashed the game when the window collapsed on death. Use it wherever the bounds come from a rectangle.
+pub fn fit<T: PartialOrd>(v: T, lo: T, hi: T) -> T {
+    let v = if v > hi { hi } else { v };
+    if v < lo { lo } else { v }
+}
+
 // ---------- Vec2 ----------
 
 #[derive(Debug, Clone, Copy, PartialEq, Default)]

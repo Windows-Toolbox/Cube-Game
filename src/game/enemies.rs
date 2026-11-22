@@ -34,7 +34,7 @@ use super::roster::{Buff, RosterRef, Stats};
 use super::settings::{self, reduce};
 use super::shapes::shade;
 use super::spawner::Spawner;
-use crate::engine::geom::{py_mod, py_round};
+use crate::engine::geom::{fit, py_mod, py_round};
 use crate::engine::gfx::{Blend, Radii};
 use crate::engine::sprite_cache;
 use crate::engine::{Anchor, Color, FRect, Rect, Surface, Vec2, ViewId, rgb, vec2};
@@ -1031,10 +1031,10 @@ impl Enemy {
         let lengths = [width, height, width, height];
         // where it is, counted clockwise from the top left corner
         let into = match side {
-            "top" => along.clamp(l, r) - l,
-            "right" => along.clamp(t, b) - t,
-            "bottom" => r - along.clamp(l, r),
-            _ => b - along.clamp(t, b),
+            "top" => fit(along, l, r) - l,
+            "right" => fit(along, t, b) - t,
+            "bottom" => r - fit(along, l, r),
+            _ => b - fit(along, t, b),
         };
         let index = order.iter().position(|s| *s == side).unwrap();
         let mut way = lengths[..index].iter().sum::<f64>() + into;

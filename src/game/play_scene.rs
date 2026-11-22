@@ -41,7 +41,7 @@ use super::spawner::{Spawner, distance_to_rect};
 use super::tables;
 use crate::engine::collision::{close, nearby_pairs, push_apart};
 use crate::engine::desktop::Desktop;
-use crate::engine::geom::py_round;
+use crate::engine::geom::{fit, py_round};
 use crate::engine::key_overlay::{Cap, KeyOverlay};
 use crate::engine::sprite_cache;
 use crate::engine::ui::draw_text_a;
@@ -311,7 +311,7 @@ impl PlayScene {
         let size = tables::buildings::get("watchtower", "size");
         let target = start + direction * tables::buildings::get("watchtower", "throw_range");
         let inner = self.desktop.area_at(target).inflate(-size, -size); // the whole tower on the monitor
-        let target = vec2(target.x.clamp(inner.left() as f64, inner.right() as f64), target.y.clamp(inner.top() as f64, inner.bottom() as f64));
+        let target = vec2(fit(target.x, inner.left() as f64, inner.right() as f64), fit(target.y, inner.top() as f64, inner.bottom() as f64));
         self.towers.push(Rc::new(RefCell::new(Watchtower::new(start, target))));
     }
 
@@ -961,7 +961,7 @@ impl PlayScene {
                 continue;
             }
             let p = en.center() - offset;
-            let marker = vec2(p.x.clamp(inside.left() as f64, inside.right() as f64), p.y.clamp(inside.top() as f64, inside.bottom() as f64));
+            let marker = vec2(fit(p.x, inside.left() as f64, inside.right() as f64), fit(p.y, inside.top() as f64, inside.bottom() as f64));
             surface.circle(en.info.color, marker, MARKER_RADIUS, 0);
         }
         let swarm_inside = surface.get_rect().inflate(-2 * SWARM_MARKER_INSET, -2 * SWARM_MARKER_INSET);
@@ -971,7 +971,7 @@ impl PlayScene {
             let near = 1.0 - (distance / SWARM_MARKER_FAR).min(1.0); // 1 at the window, 0 far away
             let size = SWARM_MARKER_SIZES.0 + (SWARM_MARKER_SIZES.1 - SWARM_MARKER_SIZES.0) * near;
             let p = middle - offset;
-            let marker = vec2(p.x.clamp(swarm_inside.left() as f64, swarm_inside.right() as f64), p.y.clamp(swarm_inside.top() as f64, swarm_inside.bottom() as f64));
+            let marker = vec2(fit(p.x, swarm_inside.left() as f64, swarm_inside.right() as f64), fit(p.y, swarm_inside.top() as f64, swarm_inside.bottom() as f64));
             let color = type_of(&s.kind).map(|t| t.color).unwrap_or(rgb(230, 40, 40));
             draw_swarm_icon(surface, marker, color, py_round(size));
         }

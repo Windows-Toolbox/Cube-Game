@@ -31,7 +31,7 @@ use windows_sys::Win32::UI::Input::KeyboardAndMouse::{
 };
 use windows_sys::Win32::UI::WindowsAndMessaging::*;
 
-use super::geom::Rect;
+use super::geom::{Rect, fit};
 use super::gfx::Surface;
 
 /// A key, by Windows' virtual-key code – with the two shift keys and the keypad's Enter told apart, as pygame did.
@@ -415,7 +415,7 @@ impl MainWindow {
             // In a gap between the rectangles: onto the nearest one.
             let nearest = area
                 .iter()
-                .map(|a| (x.clamp(a.left(), a.right() - 1), y.clamp(a.top(), a.bottom() - 1)))
+                .map(|a| (fit(x, a.left(), a.right() - 1), fit(y, a.top(), a.bottom() - 1)))
                 .min_by_key(|(px, py)| ((px - x) as i64).pow(2) + ((py - y) as i64).pow(2));
             if let Some((px, py)) = nearest {
                 unsafe { SetCursorPos(px, py) };

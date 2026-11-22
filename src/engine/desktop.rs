@@ -8,7 +8,7 @@ use windows_sys::Win32::Foundation::{LPARAM, RECT};
 use windows_sys::Win32::Graphics::Gdi::{EnumDisplayMonitors, GetMonitorInfoW, HDC, HMONITOR, MONITORINFO};
 use windows_sys::Win32::UI::WindowsAndMessaging::{SPI_GETWORKAREA, SystemParametersInfoW};
 
-use super::geom::{Rect, Vec2};
+use super::geom::{Rect, Vec2, fit};
 
 /// Leftovers thinner than this (rounding) count as covered.
 const EPSILON: f64 = 1e-6;
@@ -130,5 +130,5 @@ impl Desktop {
 }
 
 pub fn clamp_point(p: Vec2, a: &Rect) -> Vec2 {
-    Vec2::new(p.x.clamp(a.left() as f64, (a.right() - 1) as f64), p.y.clamp(a.top() as f64, (a.bottom() - 1) as f64))
+    Vec2::new(fit(p.x, a.left() as f64, (a.right() - 1) as f64), fit(p.y, a.top() as f64, (a.bottom() - 1) as f64))
 }

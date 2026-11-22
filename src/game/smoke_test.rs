@@ -177,3 +177,45 @@ fn walls_get_pushed() {
         }
     }
 }
+
+/// The ship dies with a swarm out of sight, and every frame is drawn on the way: the bot plays until a swarm is
+/// there, then the ship is left standing until it is crushed – the window shrinks to the ship's size (30 px), smaller
+/// than the margins of the swarm markers. That crashed the game on every death (2026-11-22).
+#[test]
+fn dying_with_a_swarm_around_draws() {
+    set_test_areas(vec![Rect::new(0, 0, 1920, 1040)]);
+    difficulty::reload();
+    let mut checked = vec![];
+    for (i, level) in difficulty::all().iter().map(|d| d.key.clone()).enumerate() {
+        rng::seed(i as u64 + 1);
+        let mut engine = Engine::headless(Rect::new(0, 0, 800, 560));
+        let mut scene: Box<dyn Scene> = Box::new(PlayScene::new(full_profile(&level)));
+        engine.start(&mut scene);
+        let mut swarm = false;
+        for tick in 0..(200 * 60) {
+            let window = engine.window_rect();
+            if swarm {
+                engine.fake_mouse = window.centerv();
+                engine.fake_buttons = [false, false, false];
+                engine.fake_keys.clear();
+            } else {
+                let angle = tick as f64 * 0.05;
+                engine.fake_mouse = window.centerv() + vec2(angle.cos(), angle.sin()) * (window.w.min(window.h) as f64 * 0.6);
+                engine.fake_buttons = [true, false, false];
+            }
+            engine.step(&mut scene, &[]);
+            let Some(ps) = scene.as_any().downcast_mut::<PlayScene>() else {
+                if swarm {
+                    checked.push(level.clone());
+                }
+                break;
+            };
+            swarm = swarm || ps.enemies.iter().any(|e| e.borrow().swarm.is_some());
+            if swarm {
+                let _ = engine.snapshot(&mut scene);
+            }
+        }
+    }
+    eprintln!("died with a swarm around: {checked:?}");
+    assert!(checked.len() >= 3, "only {} level(s) got there", checked.len());
+}

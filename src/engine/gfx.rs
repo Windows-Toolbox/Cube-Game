@@ -19,7 +19,7 @@ use tiny_skia::{
     Stroke, Transform,
 };
 
-use super::geom::{Anchor, Rect, Vec2};
+use super::geom::{Anchor, Rect, Vec2, fit};
 
 /// A colour as pygame takes it: red, green, blue, alpha (0 … 255).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -568,7 +568,7 @@ impl Radii {
     /// As pygame does: no corner bigger than half the shorter side.
     fn fitted(self, w: i32, h: i32) -> Radii {
         let m = w.min(h) / 2;
-        Radii { tl: self.tl.clamp(0, m), tr: self.tr.clamp(0, m), bl: self.bl.clamp(0, m), br: self.br.clamp(0, m) }
+        Radii { tl: fit(self.tl, 0, m), tr: fit(self.tr, 0, m), bl: fit(self.bl, 0, m), br: fit(self.br, 0, m) }
     }
 }
 

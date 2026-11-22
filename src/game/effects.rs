@@ -4,7 +4,7 @@
 //! wall push) happens in the play scene; an effect only draws itself – except burning ground, which tells the scene
 //! when to hurt the enemies in it.
 
-use crate::engine::geom::py_round;
+use crate::engine::geom::{fit, py_round};
 use crate::engine::gfx::Radii;
 use crate::engine::sprite_cache::{self, scratch};
 use crate::engine::{Anchor, Color, FRect, Rect, Surface, Vec2, rgb, vec2};
@@ -450,7 +450,7 @@ impl ArtilleryStrike {
     }
     /// True if any part of `rect` is inside the circle.
     pub fn hits(&self, rect: &FRect) -> bool {
-        let nearest = vec2(self.center.x.clamp(rect.left() as f64, rect.right() as f64), self.center.y.clamp(rect.top() as f64, rect.bottom() as f64));
+        let nearest = vec2(fit(self.center.x, rect.left() as f64, rect.right() as f64), fit(self.center.y, rect.top() as f64, rect.bottom() as f64));
         self.center.distance_to(nearest) <= self.radius
     }
     /// A splitter shell that just landed: its fragments, evenly round the spot (a little off). Other shells: none.

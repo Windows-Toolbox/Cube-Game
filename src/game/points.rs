@@ -19,7 +19,7 @@ use super::shapes::{STAR_COLOR, draw_star, shade};
 use super::spawner::{Spawner, distance_to_rect};
 use super::tables::points as stats;
 use crate::engine::desktop::Desktop;
-use crate::engine::geom::py_round;
+use crate::engine::geom::{fit, py_round};
 use crate::engine::gfx::Radii;
 use crate::engine::sprite_cache;
 use crate::engine::ui::draw_text;
@@ -280,7 +280,7 @@ impl Points {
                 continue;
             }
             let position = p.position - offset;
-            let spot = vec2(position.x.clamp(inside.left() as f64, inside.right() as f64), position.y.clamp(inside.top() as f64, inside.bottom() as f64));
+            let spot = vec2(fit(position.x, inside.left() as f64, inside.right() as f64), fit(position.y, inside.top() as f64, inside.bottom() as f64));
             let d = position - spot;
             let direction = if d.length_squared() > 0.0 { d.normalize() } else { (spot - middle).normalize() };
             let color = if !p.revealed { HIDDEN_COLOR } else if p.threat() { THREAT_COLOR } else { FIND_COLOR };
